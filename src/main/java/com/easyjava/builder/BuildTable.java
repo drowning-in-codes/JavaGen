@@ -1,4 +1,5 @@
-package com.easyjava.builder;/**
+package com.easyjava.builder;
+/**
  * @Author: proanimer
  * @Description:
  * @Date: Created in 2024/5/8
@@ -18,7 +19,10 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @projectName: workspace
@@ -33,6 +37,7 @@ public class BuildTable {
     private static final Logger logger = LoggerFactory.getLogger(BuildTable.class);
     private static final String SQL_SHOW_TABLE_STATUS = "SHOW TABLE STATUS";
     private static final String SQL_SHOW_TABLE_FIELDS = "SHOW FULL FIELDS FROM %s";
+    private static final String SQL_SHOW_TABLE_INDEX = "SHOW INDEX FROM %s";
 
     static {
         String diverName = PropertiesUtils.getString("db.driver.name");
@@ -48,7 +53,7 @@ public class BuildTable {
         }
     }
 
-    public static void getTables() {
+    public static List<TableInfo> getTables() {
         PreparedStatement ps = null;
         ResultSet tableResult = null;
         List<TableInfo> tableInfoList = new ArrayList<>();
@@ -59,23 +64,20 @@ public class BuildTable {
             while (tableResult.next()) {
                 String tableName = tableResult.getString("name");
                 String comment = tableResult.getString("comment");
-                logger.info("表名：{}，注释：{}", tableName, comment);
                 TableInfo tableInfo = new TableInfo();
                 tableInfo.setTableName(tableName);
                 String beanName = tableName;
                 if (Constants.IGNORE_TABLE_PREFIX) {
                     beanName = tableName.substring(tableName.indexOf("_") + 1);
-                    logger.info("bean_name:{}", beanName);
                 }
                 beanName = processField(beanName, true);
                 tableInfo.setBeanName(beanName);
                 tableInfo.setComment(comment);
-                tableInfo.setBeanParamName(beanName + Constants.SUFFIX_BEAN_PARAM);
-                List<FieldInfo> fieldInfoList = readFieldInfo(tableInfo);
-                logger.info(JsonUtils.convertObj2Json(tableInfo));
-                logger.info(JsonUtils.convertObj2Json(fieldInfoList));
-
+                tableInfo.setBeanParamName(beanName + Constants.SUFFIX_BEAN_QUERY);
+                readFieldInfo(tableInfo);
+                getKeyIndexInfo(tableInfo);
                 tableInfoList.add(tableInfo);
+                logger.info(JsonUtils.convertObj2Json(tableInfo));
 
             }
         } catch (Exception e) {
@@ -104,25 +106,29 @@ public class BuildTable {
                 }
             }
         }
+        return tableInfoList;
     }
 
     public static void main(String[] args) {
 
     }
 
-    public static List<FieldInfo> readFieldInfo(TableInfo tableInfo) {
+    public static void readFieldInfo(TableInfo tableInfo) {
         PreparedStatement ps = null;
         ResultSet fieldResult = null;
         List<FieldInfo> fieldInfoList = new ArrayList<>();
+        boolean haveDateTime = false;
+        boolean haveDate = false;
+        boolean haveDecimal = false;
+        List<FieldInfo> fieldExtendList = new ArrayList<>();
         try {
-            ps = conn.prepareStatement(String.format(SQL_SHOW_TABLE_FIELDS,tableInfo.getTableName()));
+            ps = conn.prepareStatement(String.format(SQL_SHOW_TABLE_FIELDS, tableInfo.getTableName()));
             fieldResult = ps.executeQuery();
             while (fieldResult.next()) {
                 String field = fieldResult.getString("Field");
                 String type = fieldResult.getString("type");
                 String extra = fieldResult.getString("extra");
                 String comment = fieldResult.getString("comment");
-                logger.info("id:{} type:{} extra{} comment:{}", field, type, extra, comment);
                 if (type.indexOf("(") > 0) {
                     type = type.substring(0, type.indexOf("("));
                 }
@@ -135,21 +141,52 @@ public class BuildTable {
                 fieldInfo.setPropertyName(propertyName);
                 String javaType = fieldInfo.getSqlType();
                 fieldInfo.setJavaType(processJavaType(javaType));
-                if (ArrayUtils.contains(Constants.SQL_DATE_TIME_TYPES, type)) {
-                    tableInfo.setHaveDateTime(true);
-                }
+
                 if (ArrayUtils.contains(Constants.SQL_DATE_TYPES, type)) {
-                    tableInfo.setHaveDate(true);
+                    haveDate = true;
+                }
+                if (ArrayUtils.contains(Constants.SQL_DATE_TIME_TYPES, type)) {
+                    haveDateTime = true;
                 }
                 if (ArrayUtils.contains(Constants.SQL_DECIMAL_TYPES, type)) {
-                    tableInfo.setHaveBigDecimal(true);
+                    haveDecimal = true;
                 }
+
+                if (ArrayUtils.contains(Constants.SQL_STRING_TYPES, type)) {
+                    FieldInfo fuzzyField = new FieldInfo();
+                    fuzzyField.setJavaType(fieldInfo.getJavaType());
+                    fuzzyField.setPropertyName(propertyName + Constants.SUFFIX_BEAN_QUERY_FUZZY);
+                    fuzzyField.setFieldName(fieldInfo.getFieldName());
+                    fuzzyField.setSqlType(type);
+                    fieldExtendList.add(fuzzyField);
+                }
+                if (ArrayUtils.contains(Constants.SQL_DATE_TIME_TYPES, type) || ArrayUtils.contains(Constants.SQL_DATE_TYPES, type)) {
+                    FieldInfo timeStartField = new FieldInfo();
+                    timeStartField.setJavaType("String");
+                    timeStartField.setPropertyName(propertyName + Constants.SUFFIX_BEAN_QUERY_START);
+                    timeStartField.setFieldName(fieldInfo.getFieldName());
+                    timeStartField.setSqlType(type);
+                    fieldExtendList.add(timeStartField);
+
+                    FieldInfo timeEndField = new FieldInfo();
+                    timeEndField.setJavaType("String");
+                    timeEndField.setFieldName(fieldInfo.getFieldName());
+                    timeEndField.setSqlType(type);
+                    timeEndField.setPropertyName(propertyName + Constants.SUFFIX_BEAN_QUERY_END);
+                    fieldExtendList.add(timeEndField);
+                }
+
                 fieldInfoList.add(fieldInfo);
             }
-
+            tableInfo.setHaveDate(haveDate);
+            tableInfo.setHaveDateTime(haveDateTime);
+            tableInfo.setHaveBigDecimal(haveDecimal);
+            tableInfo.setFieldList(fieldInfoList);
+            tableInfo.setFieldExtendList(fieldExtendList);
         } catch (Exception e) {
+            logger.error("读取字段失败", e);
             e.printStackTrace();
-        }finally {
+        } finally {
             if (fieldResult != null) {
                 try {
                     fieldResult.close();
@@ -165,15 +202,18 @@ public class BuildTable {
                 }
             }
         }
-        return fieldInfoList;
     }
 
     private static String processField(String field, Boolean upperCaseFirstLetter) {
         StringBuilder sb = new StringBuilder();
         String[] fields = field.split("_");
         for (int index = 0; index < fields.length; index++) {
-            if ((index == 0) && (upperCaseFirstLetter)) {
-                sb.append(StringUtils.upperCaseFirstLetter(fields[index]));
+            if (index == 0) {
+                if (upperCaseFirstLetter) {
+                    sb.append(StringUtils.upperCaseFirstLetter(fields[index]));
+                } else {
+                    sb.append(fields[index]);
+                }
             } else {
                 sb.append(StringUtils.upperCaseFirstLetter(fields[index]));
             }
@@ -181,17 +221,68 @@ public class BuildTable {
         return sb.toString();
     }
 
+    public static void getKeyIndexInfo(TableInfo tableInfo) {
+        PreparedStatement ps = null;
+        ResultSet fieldResult = null;
+        try {
+            Map<String, FieldInfo> tempMap = new HashMap<>();
+            for (FieldInfo fieldInfo : tableInfo.getFieldList()) {
+                tempMap.put(fieldInfo.getFieldName(), fieldInfo);
+            }
+            ps = conn.prepareStatement(String.format(SQL_SHOW_TABLE_INDEX, tableInfo.getTableName()));
+            fieldResult = ps.executeQuery();
+            while (fieldResult.next()) {
+                String keyName = fieldResult.getString("key_name");
+                int nonUnique = Integer.parseInt(fieldResult.getString("non_unique"));
+                String columnName = fieldResult.getString("column_name");
+                if (nonUnique == 1) {
+                    continue;
+                }
+                List<FieldInfo> keyFieldList = tableInfo.getKeyIndexMap().get(keyName);
+                if (null == keyFieldList) {
+                    keyFieldList = new ArrayList<>();
+                    tableInfo.getKeyIndexMap().put(keyName, keyFieldList);
+
+                }
+
+                keyFieldList.add(tempMap.get(columnName));
+            }
+
+        } catch (Exception e) {
+            logger.error("读取索引失败", e);
+            e.printStackTrace();
+        } finally {
+            if (fieldResult != null) {
+                try {
+                    fieldResult.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
     private static String processJavaType(String type) {
         if (ArrayUtils.contains(Constants.SQL_INTEGER_TYPES, type)) {
             return "Integer";
         } else if (ArrayUtils.contains(Constants.SQL_STRING_TYPES, type)) {
-            return "STRING";
-        } else if (ArrayUtils.contains(Constants.SQL_LONG_TYPES, type)) {
+            return "String";
+        } else if (ArrayUtils.contains(Constants.SQL_DATE_TYPES, type)) {
+            return "Date";
+        } else if (ArrayUtils.contains(Constants.SQL_DATE_TIME_TYPES, type)) {
             return "Date";
         } else if (ArrayUtils.contains(Constants.SQL_DECIMAL_TYPES, type)) {
             return "BigDecimal";
-        }
-        else {
+        } else if (ArrayUtils.contains(Constants.SQL_LONG_TYPES, type)) {
+            return "Long";
+        } else {
             throw new RuntimeException("无法识别的类型" + type);
         }
     }

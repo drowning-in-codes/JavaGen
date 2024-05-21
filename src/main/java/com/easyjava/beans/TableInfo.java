@@ -38,6 +38,19 @@ public class TableInfo {
      * 字段列表
      */
     private List<FieldInfo> fieldList;
+
+    public List<FieldInfo> getFieldExtendList() {
+        return fieldExtendList;
+    }
+
+    public void setFieldExtendList(List<FieldInfo> fieldExtendList) {
+        this.fieldExtendList = fieldExtendList;
+    }
+
+    /**
+     * 扩展字段信息
+     */
+    private List<FieldInfo> fieldExtendList;
     /**
      * 索引字段
      */

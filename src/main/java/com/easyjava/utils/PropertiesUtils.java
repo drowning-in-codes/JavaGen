@@ -7,6 +7,8 @@ package com.easyjava.utils;/**
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
@@ -27,7 +29,8 @@ public class PropertiesUtils {
         InputStream is = null;
         try {
             is = PropertiesUtils.class.getClassLoader().getResourceAsStream("application.properties");
-            props.load(is);
+            assert is != null;
+            props.load(new InputStreamReader(is, StandardCharsets.UTF_8));
             for (Object o : props.keySet()) {
                 String key = (String) o;
                 PROPER_MAP.put(key, props.getProperty(key));

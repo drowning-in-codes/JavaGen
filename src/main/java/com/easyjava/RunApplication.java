@@ -1,11 +1,16 @@
-package com.easyjava;/**
+package com.easyjava;
+/**
  * @Author: proanimer
  * @Description:
  * @Date: Created in 2024/5/8
  * @Modified By
  */
 
-import com.easyjava.builder.BuildTable;
+import com.easyjava.beans.TableInfo;
+import com.easyjava.builder.*;
+import com.mysql.cj.xdevapi.Table;
+
+import java.util.List;
 
 /**
  * @projectName: workspace
@@ -17,7 +22,13 @@ import com.easyjava.builder.BuildTable;
  */
 public class RunApplication {
     public static void main(String[] args) {
-        BuildTable.getTables();
-
+        List<TableInfo> tableInfoList =  BuildTable.getTables();
+        BuildBase.execute();
+        for (TableInfo tableInfo : tableInfoList) {
+            BuildPO.execute(tableInfo);
+            BuildQuery.execute(tableInfo);
+            BuildMapper.execute(tableInfo);
+            BuildMapperXml.execute(tableInfo);
+        }
     }
 }
