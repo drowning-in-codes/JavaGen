@@ -66,7 +66,13 @@ public class Constants {
     public static String PATH_VO;
     public static String PACKAGE_VO;
     public static String PATH_MAPPERS_XML;
-
+    public static String PACKAGE_EXCEPTION;
+    public static String PATH_EXCEPTION;
+    public static String PACKAGE_CONTROLLER;
+    public static String PATH_CONTROLLER;
+    public static String PATH_STATIC;
+    public static String PATH_ERROR_STATIC;
+    public static Boolean DEAL_STATIC_404;
     static {
 
         IGNORE_TABLE_PREFIX = Boolean.valueOf(PropertiesUtils.getString("ignore.table.prefix"));
@@ -117,6 +123,17 @@ public class Constants {
 
         PACKAGE_VO = Paths.get(PACKAGE_BASE) + "." + PropertiesUtils.getString("package.vo");
         PATH_VO = Paths.get(PATH_BASE).resolve(PACKAGE_VO).toString().replace(".", File.separator);
+
+        PACKAGE_EXCEPTION = Paths.get(PACKAGE_BASE) + "." + PropertiesUtils.getString("package.exception");
+        PATH_EXCEPTION = Paths.get(PATH_BASE).resolve(PACKAGE_EXCEPTION).toString().replace(".", File.separator);
+
+        PACKAGE_CONTROLLER = Paths.get(PACKAGE_BASE) + "." + PropertiesUtils.getString("package.controller");
+        PATH_CONTROLLER = Paths.get(PATH_BASE).resolve(PACKAGE_CONTROLLER).toString().replace(".", File.separator);
+
+        PATH_STATIC = Paths.get(PropertiesUtils.getString("path.base")).resolve(PATH_RESOURCES).resolve("static").toString();
+        PATH_ERROR_STATIC = Paths.get(PATH_STATIC).resolve("error").toString();
+
+        DEAL_STATIC_404 = Boolean.valueOf(PropertiesUtils.getString("deal_static_404"));
     }
 
     public static final String[] SQL_DATE_TIME_TYPES = new String[]{"datetime", "timestamp"};

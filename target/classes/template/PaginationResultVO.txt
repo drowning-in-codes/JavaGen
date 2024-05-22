@@ -1,19 +1,19 @@
 public class PaginationResultVO<T> {
-    private int totalCount;
-    private int pageSize;
-    private int pageNo;
-    private int pageTotal;
+    private Integer totalCount;
+    private Integer pageSize;
+    private Integer pageNo;
+    private Integer pageTotal;
 
     private List<T> list = new ArrayList<T>();
 
-    public PaginationResultVO(int totalCount, int pageSize, int pageNo, List<T> list) {
+    public PaginationResultVO(Integer totalCount, Integer pageSize, Integer pageNo, List<T> list) {
         this.totalCount = totalCount;
         this.pageSize = pageSize;
         this.pageNo = pageNo;
         this.list = list;
     }
 
-    public PaginationResultVO(int totalCount, int pageSize, int pageNo, int pageTotal, List<T> list) {
+    public PaginationResultVO(Integer totalCount, Integer pageSize, Integer pageNo, Integer pageTotal, List<T> list) {
         if (pageNo == 0) {
             pageNo = 1;
         }
@@ -32,11 +32,11 @@ public class PaginationResultVO<T> {
 
     }
 
-    public int getTotalCount() {
+    public Integer getTotalCount() {
         return totalCount;
     }
 
-    public void setTotalCount(Long totalCount) {
+    public void setTotalCount(int totalCount) {
         this.totalCount = totalCount;
     }
 
@@ -48,7 +48,7 @@ public class PaginationResultVO<T> {
         this.pageSize = pageSize;
     }
 
-    public int getPageNo() {
+    public Integer getPageNo() {
         return pageNo;
     }
 
@@ -56,7 +56,7 @@ public class PaginationResultVO<T> {
         this.pageNo = pageNo;
     }
 
-    public int getPageTotal() {
+    public Integer getPageTotal() {
         return pageTotal;
     }
 

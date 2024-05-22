@@ -82,7 +82,7 @@ public class BuildServiceImpl {
             String mapperBeanName = StringUtils.lowerCaseFirstLetter(mapperName);
             bw.write("\t@Resource");
             bw.newLine();
-            bw.write("\tprivate " + mapperName + "<" + tableInfo.getBeanName() + "," + tableInfo.getBeanParamName() + "> " + mapperBeanName + ";");
+            bw.write("\tprivate " + mapperName + "<" + tableInfo.getBeanName() + ", " + tableInfo.getBeanParamName() + "> " + mapperBeanName + ";");
             bw.newLine();
             bw.newLine();
 
