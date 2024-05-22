@@ -57,6 +57,15 @@ public class BuildBase {
         headerInfoList.add("package " + Constants.PACKAGE_QUERY);
         build(headerInfoList, "BaseQuery", Constants.PATH_QUERY);
 
+        //生成PaginationResultVO
+        headerInfoList.clear();
+        headerInfoList.add("package " + Constants.PACKAGE_VO);
+        headerInfoList.add("import java.util.ArrayList");
+        headerInfoList.add("import java.util.List");
+        build(headerInfoList, "PaginationResultVO", Constants.PATH_VO);
+
+
+
 
     }
     private static void build(List<String> headerInfoList, String filename, String outputPath) {
@@ -87,6 +96,7 @@ public class BuildBase {
                     bw.newLine();
                 }
             }
+            bw.newLine();
             String lineInfo = null;
             while ((lineInfo = br.readLine()) != null) {
                 bw.write(lineInfo);

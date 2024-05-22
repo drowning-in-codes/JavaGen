@@ -56,10 +56,15 @@ public class Constants {
     public static String SUFFIX_BEAN_QUERY_START;
     public static String SUFFIX_BEAN_QUERY_END;
 
+    public static String PACKAGE_SERVICE;
+    public static String PACKAGE_SERVICE_IMPL;
+    public static String PATH_SERVICE;
+    public static String PATH_SERVICE_IMPL;
     public static String PACKAGE_MAPPER;
     public static String PATH_MAPPER;
     public static String SUFFIX_MAPPERS;
-
+    public static String PATH_VO;
+    public static String PACKAGE_VO;
     public static String PATH_MAPPERS_XML;
 
     static {
@@ -103,6 +108,15 @@ public class Constants {
         PATH_MAPPERS_XML = Paths.get(PropertiesUtils.getString("path.base")).resolve(PATH_RESOURCES).resolve(PACKAGE_MAPPER).toString().replace(".", File.separator);
         SUFFIX_MAPPERS = PropertiesUtils.getString("suffix.mappers");
         AUTHOR_COMMENT = PropertiesUtils.getString("author.comment");
+
+        PACKAGE_SERVICE = Paths.get(PACKAGE_BASE) + "." + PropertiesUtils.getString("package.service");
+        PATH_SERVICE = Paths.get(PATH_BASE).resolve(PACKAGE_SERVICE).toString().replace(".", File.separator);
+
+        PACKAGE_SERVICE_IMPL = Paths.get(PACKAGE_BASE) + "." + PropertiesUtils.getString("package.service.impl");
+        PATH_SERVICE_IMPL = Paths.get(PATH_BASE).resolve(PACKAGE_SERVICE_IMPL).toString().replace(".", File.separator);
+
+        PACKAGE_VO = Paths.get(PACKAGE_BASE) + "." + PropertiesUtils.getString("package.vo");
+        PATH_VO = Paths.get(PATH_BASE).resolve(PACKAGE_VO).toString().replace(".", File.separator);
     }
 
     public static final String[] SQL_DATE_TIME_TYPES = new String[]{"datetime", "timestamp"};

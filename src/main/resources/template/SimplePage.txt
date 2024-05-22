@@ -11,7 +11,7 @@ public class SimplePage {
 
     }
 
-    public SimplePage(Integer pageNo, int countTotal, int pageSize) {
+    public SimplePage(int pageNo, int countTotal, int pageSize) {
         if (null == pageNo) {
             pageNo = 0;
         }
@@ -33,7 +33,7 @@ public class SimplePage {
         if (this.pageSize > 0) {
             this.pageTotal = this.countTotal % this.pageSize == 0 ? this.countTotal / this.pageSize : this.countTotal / this.pageSize + 1;
         } else {
-            pageTotal = 1;
+            this.pageTotal = 1;
         }
         if (pageNo <= 1) {
             pageNo = 1;

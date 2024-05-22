@@ -244,7 +244,6 @@ public class BuildTable {
                     tableInfo.getKeyIndexMap().put(keyName, keyFieldList);
 
                 }
-
                 keyFieldList.add(tempMap.get(columnName));
             }
 

@@ -8,6 +8,10 @@ public class BaseQuery {
         return simplePage;
     }
 
+    public void setSimplePage(SimplePage simplePage) {
+        this.simplePage = simplePage;
+    }
+
     public Integer getPageNo() {
         return pageNo;
     }
