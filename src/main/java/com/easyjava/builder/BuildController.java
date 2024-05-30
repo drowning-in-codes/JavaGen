@@ -154,7 +154,7 @@ public class BuildController {
                     }
                     paramsBuilder.append(fieldInfo.getPropertyName());
                     if (index < keyFieldInfoList.size()) {
-                        methodParams.append(", ");
+                        paramsBuilder.append(", ");
                     }
                 }
                 BuildComment.createFieldComment(bw, "根据" + methodName + "查询");

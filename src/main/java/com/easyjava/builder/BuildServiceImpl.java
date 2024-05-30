@@ -177,7 +177,7 @@ public class BuildServiceImpl {
                     }
                     paramsBuilder.append(fieldInfo.getPropertyName());
                     if (index < keyFieldInfoList.size()) {
-                        methodParams.append(", ");
+                        paramsBuilder.append(", ");
                     }
 
                 }

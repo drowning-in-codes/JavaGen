@@ -34,6 +34,11 @@ public class BuildBase {
         build(headerInfoList, "DateUtils", Constants.PATH_UTILS);
 
         headerInfoList.clear();
+        headerInfoList.add("import org.apache.commons.lang3.StringUtils");
+        headerInfoList.add("package " + Constants.PACKAGE_UTILS);
+        build(headerInfoList, "StringUtils", Constants.PATH_UTILS);
+
+        headerInfoList.clear();
         headerInfoList.add("package " + Constants.PACKAGE_ENUM);
         build(headerInfoList, "DateTimePatternEnum", Constants.PATH_ENUM);
 
@@ -70,6 +75,7 @@ public class BuildBase {
         headerInfoList.add("package " + Constants.PACKAGE_EXCEPTION);
         headerInfoList.add("import " + Constants.PACKAGE_ENUM + ".ResponseCodeEnum;");
         build(headerInfoList, "BusinessException", Constants.PATH_EXCEPTION);
+
         //生成ResponseVO
         headerInfoList.clear();
         headerInfoList.add("package " + Constants.PACKAGE_VO);

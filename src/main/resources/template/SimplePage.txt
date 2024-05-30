@@ -30,7 +30,7 @@ public class SimplePage {
         if (this.pageSize <= 0) {
             this.pageSize = PageSize.SIZE20.getSize();
         }
-        if (this.pageSize > 0) {
+        if (this.countTotal > 0) {
             this.pageTotal = this.countTotal % this.pageSize == 0 ? this.countTotal / this.pageSize : this.countTotal / this.pageSize + 1;
         } else {
             this.pageTotal = 1;
