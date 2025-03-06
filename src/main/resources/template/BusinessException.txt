@@ -53,5 +53,11 @@ public class BusinessException extends Exception {
     public void setMsg(String message) {
         this.message = message;
     }
+
+    @Override
+    public synchronized Throwable fillInStackTrace() {
+        return this;
+    }
 }
+
 

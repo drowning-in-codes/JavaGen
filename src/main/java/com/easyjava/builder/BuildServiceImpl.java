@@ -156,9 +156,22 @@ public class BuildServiceImpl {
             bw.write("\t\treturn this." + mapperBeanName + ".insertOrUpdateBatch(listBean);");
             bw.newLine();
             bw.write("\t}");
-
             bw.newLine();
 
+            BuildComment.createMethodComment(bw, "多条件修改");
+            bw.write("\tpublic int updateByParam(" + tableInfo.getBeanName() + " bean, "+tableInfo.getBeanParamName()+" query) {");
+            bw.newLine();
+            bw.write("\t\treturn this." + mapperBeanName + ".updateByParam(bean,query);");
+            bw.newLine();
+            bw.write("\t}");
+            bw.newLine();
+            BuildComment.createMethodComment(bw, "多条件删除");
+            bw.write("\tpublic int deleteByParam(" +tableInfo.getBeanParamName()+" query) {");
+            bw.newLine();
+            bw.write("\t\treturn this." + mapperBeanName + ".deleteByParam(query);");
+            bw.newLine();
+            bw.write("\t}");
+            bw.newLine();
             for (Map.Entry<String, List<FieldInfo>> entry : tableInfo.getKeyIndexMap().entrySet()) {
                 List<FieldInfo> keyFieldInfoList = entry.getValue();
                 int index = 0;

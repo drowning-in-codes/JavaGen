@@ -90,7 +90,13 @@ public class BuildMapper {
                 bw.write("\tInteger deleteBy" + methodName + "(" + methodParams + ");");
                 bw.newLine();
             }
-            bw.newLine();
+//            BuildComment.createMethodComment(bw, "多条件修改");
+//            bw.write("\tInteger updateByParam(@Param(\"bean\") T t, @Param(\"query\") P p);");
+//            bw.newLine();
+//
+//            BuildComment.createMethodComment(bw, "多条件删除");
+//            bw.write("\tInteger deleteByParam(@Param(\"query\") P p);");
+//            bw.newLine();
             bw.write("}");
             bw.flush();
         } catch (Exception e) {

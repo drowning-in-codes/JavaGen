@@ -91,7 +91,6 @@ public class BuildService {
             BuildComment.createMethodComment(bw, "批量新增或修改");
             bw.write("\tint addOrUpdateBatch(List<" + tableInfo.getBeanName() + "> listBean);");
             bw.newLine();
-            bw.newLine();
 
             for (Map.Entry<String, List<FieldInfo>> entry : tableInfo.getKeyIndexMap().entrySet()) {
                 List<FieldInfo> keyFieldInfoList = entry.getValue();
